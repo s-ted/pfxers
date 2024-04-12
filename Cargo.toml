@@ -1,0 +1,25 @@
+[package]
+name = "pfx-to-pem"
+version = "1.0.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0"
+
+clap = { version = "4.5", features = ["derive", "env"] }
+p12-keystore = "0.1"
+pem = "3.0"
+
+env_logger = "0.11"
+log = "0.4"
+
+rpassword = "7.3"
+colored = "2.0"
+
+[profile.release]
+strip = true  # Automatically strip symbols from the binary.
+opt-level = "z"  # Optimize for size.
+lto = true
+panic = "abort"
