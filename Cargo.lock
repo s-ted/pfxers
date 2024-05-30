@@ -593,6 +593,7 @@ dependencies = [
  "p12-keystore",
  "pem",
  "rpassword",
+ "x509-parser",
 ]
 
 [[package]]

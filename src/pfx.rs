@@ -47,7 +47,26 @@ pub(crate) fn show_info(key: Option<&PrivateKeyChain>, certs: &[Certificate]) {
             } else {
                 format!("issued by {}", cert.issuer()).into()
             }
-        )
+        );
+
+        {
+            use x509_parser::prelude::*;
+            if let Ok((_rem, cert)) = X509Certificate::from_der(cert.as_der()) {
+                if let Ok(sans) = cert.subject_alternative_name() {
+                    if let Some(sans) = sans.map(|x| x.value.general_names.clone()) {
+                        if !sans.is_empty() {
+                            let sans = sans
+                                .iter()
+                                .map(|x| format!("{}", x.to_string()))
+                                .collect::<Vec<_>>()
+                                .join(", ");
+
+                            println!("  [{kind}] {sans}", kind = "SANS".blue(),);
+                        }
+                    }
+                }
+            }
+        }
     });
 }
 
