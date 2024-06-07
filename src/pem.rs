@@ -35,6 +35,11 @@ pub(crate) fn show_info(key: Option<&PrivateKeyChain>, certs: &[Certificate]) {
         )
     }
 
+    let now = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .expect("unable to get current time")
+        .as_secs() as i64;
+
     certs.iter().for_each(|cert| {
         println!(
             "[{kind}] for {subject} ({issuer})",
@@ -50,6 +55,15 @@ pub(crate) fn show_info(key: Option<&PrivateKeyChain>, certs: &[Certificate]) {
         {
             use x509_parser::prelude::*;
             if let Ok((_rem, cert)) = X509Certificate::from_der(cert.as_der()) {
+                let not_before = cert.validity().not_before;
+                let not_after = cert.validity.not_after;
+                let validity = if cert.validity.not_after.timestamp() < now {
+                    "EXPIRED".red().bold()
+                } else {
+                    "✅".green()
+                };
+                println!("  {not_before:} -> {not_after:} {validity:}",);
+
                 if let Ok(sans) = cert.subject_alternative_name() {
                     if let Some(sans) = sans.map(|x| x.value.general_names.clone()) {
                         if !sans.is_empty() {

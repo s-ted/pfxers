@@ -33,6 +33,7 @@ fn main() -> Result<()> {
                      them"
                 );
             }
+
             pem::show_info(key.as_ref(), &certs);
         }
     }
