@@ -22,8 +22,13 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           version: ^0.8.0
       - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-deny
       - name: Run check dependencies
-        run: earthly --ci +check-dependencies
+        run: cargo deny --all-features check bans license sources advisories
 
   lint:
     name: Lint
@@ -87,6 +92,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           version: ^0.8.0
       - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
       - name: Run build
         run: earthly --ci --push +build-all
       - name: Publish
@@ -94,5 +100,5 @@ jobs:
         with:
           draft: true
           files: |
-            dist/pfxers
-            dist/pfxers.exe
+            target/pfxers
+            target/pfxers.exe
