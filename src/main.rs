@@ -33,7 +33,7 @@ fn main() -> Result<()> {
                      them"
                 );
             }
-            pfx::show_info(key.as_ref(), &certs);
+            pem::show_info(key.as_ref(), &certs);
         }
     }
 
