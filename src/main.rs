@@ -1,47 +1,28 @@
+mod app;
 mod args;
+mod components;
+mod errors;
+mod logging;
 mod pem;
 mod pfx;
 
 fn main() -> Result<()> {
-    #[cfg(windows)]
-    let _ = colored::control::set_virtual_terminal(true).unwrap_or(());
+    crate::errors::init()?;
+    crate::logging::init()?;
 
-    env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info"))
-        .try_init()?;
-
-    let args = &Args::parse();
+    let args = Args::parse();
     debug!("Args: {:#?}", args);
 
-    match &args.command {
-        args::Commands::PfxInfo(PfxInfoArgs { input, password_file }) => {
-            let (key, certs) = pfx::parse_fpx(input, password_file.as_deref())?;
-
-            pfx::show_info(key.as_ref(), &certs);
-        }
-
-        args::Commands::PfxToPem(PfxToPemArgs { input, password_file }) => {
-            let (key, certs) = pfx::parse_fpx(input, password_file.as_deref())?;
-
-            pfx::show_pem(key.as_ref(), &certs);
-        }
-
-        args::Commands::PemInfo(PemInfoArgs { input }) => {
-            let (key, certs) = pem::parse_pem(input)?;
-            if key.is_some() {
-                info!(
-                    "this tool is not able to extract private keys information: it only detect \
-                     them"
-                );
-            }
-            pfx::show_info(key.as_ref(), &certs);
-        }
-    }
+    let state = AppState::try_from(args)?;
+    App::new(250)?.handle_panics().states(state).sets(TheApp).run()?;
 
     Ok(())
 }
 
-use anyhow::Result;
+use app::{AppState, TheApp};
 use clap::Parser as _;
-use log::{debug, info};
+use color_eyre::Result;
+use tracing::debug;
+use widgetui::*;
 
-use crate::args::{Args, PemInfoArgs, PfxInfoArgs, PfxToPemArgs};
+use crate::args::Args;
