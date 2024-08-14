@@ -1,14 +1,23 @@
-pub(crate) fn parse_fpx(
+pub(crate) fn parse_pfx(
     pfx_file_path: &str,
     password_file_path: Option<&str>,
+    password: Option<Hide<String>>,
 ) -> Result<(Option<PrivateKeyChain>, Vec<Certificate>)> {
     let pfx_content = std::fs::read(pfx_file_path)?;
-    let password = password_file_path
-        .map(std::fs::read_to_string)
-        .unwrap_or_else(|| rpassword::prompt_password("PFX file password: "))
-        .unwrap_or_default();
+    let password = if let Some(password) = password {
+        password
+    } else {
+        if let Some(password_file_path) = password_file_path {
+            std::fs::read_to_string(password_file_path)
+                .map_err(PfxError::UnableToReadPasswordFile)?
+        } else {
+            String::new()
+        }
+        .into()
+    };
 
-    let pfx = KeyStore::from_pkcs12(&pfx_content, password.as_str())?;
+    let pfx =
+        KeyStore::from_pkcs12(&pfx_content, password.as_str()).map_err(PfxError::ParseError)?;
 
     let keys = pfx
         .entries()
@@ -28,90 +37,18 @@ pub(crate) fn parse_fpx(
     Ok((keys.first().cloned(), keys_certificates.chain(certs).cloned().collect()))
 }
 
-pub(crate) fn show_info(key: Option<&PrivateKeyChain>, certs: &[Certificate]) {
-    if let Some(x) = key {
-        println!(
-            "[{kind}] for {subject}",
-            kind = "KEY".red().bold(),
-            subject = x.chain().first().map(|cert| cert.subject()).unwrap_or("???").bold()
-        )
-    }
+#[derive(thiserror::Error, Debug)]
+pub(crate) enum PfxError {
+    #[error(
+        "Unable to parse PFX file, are you sure you gave the right password using --password or \
+         --password-file?"
+    )]
+    ParseError(#[from] p12_keystore::error::Error),
 
-    let now = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .expect("unable to get current time")
-        .as_secs() as i64;
-
-    certs.iter().for_each(|cert| {
-        println!(
-            "[{kind}] for {subject} ({issuer})",
-            kind = "CERT".green().bold(),
-            subject = cert.subject().bold(),
-            issuer = if cert.issuer() == cert.subject() {
-                "self-signed".red().bold()
-            } else {
-                format!("issued by {}", cert.issuer()).into()
-            }
-        );
-
-        {
-            use x509_parser::prelude::*;
-            if let Ok((_rem, cert)) = X509Certificate::from_der(cert.as_der()) {
-                let not_before = cert.validity().not_before;
-                let not_after = cert.validity.not_after;
-                let validity = if cert.validity.not_after.timestamp() < now {
-                    "EXPIRED".red().bold()
-                } else {
-                    "✅".green()
-                };
-                println!("  {not_before:} -> {not_after:} {validity:}",);
-
-                if let Ok(sans) = cert.subject_alternative_name() {
-                    if let Some(sans) = sans.map(|x| x.value.general_names.clone()) {
-                        if !sans.is_empty() {
-                            let sans = sans
-                                .iter()
-                                .map(|x| format!("{}", x.to_string()))
-                                .collect::<Vec<_>>()
-                                .join(", ");
-
-                            println!("  [{kind}] {sans}", kind = "SANS".blue(),);
-                        }
-                    }
-                }
-            }
-        }
-    });
+    #[error("Unable to read password file given in --password-file")]
+    UnableToReadPasswordFile(#[from] std::io::Error),
 }
 
-pub(crate) fn show_pem(key: Option<&PrivateKeyChain>, certs: &[Certificate]) {
-    if let Some(key) = key {
-        println!(
-            "[{kind}] for {subject}",
-            kind = "KEY".red().bold(),
-            subject = key.chain().first().map(|cert| cert.subject()).unwrap_or("???").bold()
-        );
-        let pem = Pem::new("PRIVATE KEY", key.key());
-        println!("{}", encode(&pem));
-    }
-
-    certs.iter().for_each(|cert| {
-        println!(
-            "[{kind}] for {subject} ({issuer})",
-            kind = "CERT".green().bold(),
-            subject = cert.subject().bold(),
-            issuer = if cert.issuer() == cert.subject() {
-                "self-signed".red().bold()
-            } else {
-                format!("issued by {}", cert.issuer()).into()
-            }
-        );
-        let pem = Pem::new("CERTIFICATE", cert.as_der());
-        println!("{}", encode(&pem));
-    });
-}
-
-use anyhow::Result;
-use colored::Colorize as _;
+use color_eyre::Result;
+use hide::Hide;
 use p12_keystore::{Certificate, KeyStore, KeyStoreEntry, PrivateKeyChain};
-use pem::{encode, Pem};
