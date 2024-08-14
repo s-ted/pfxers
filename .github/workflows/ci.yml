@@ -94,5 +94,5 @@ jobs:
         with:
           draft: true
           files: |
-            dist/pfx-to-pem
-            dist/pfx-to-pem.exe
+            dist/pfxers
+            dist/pfxers.exe

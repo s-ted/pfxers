@@ -1,19 +1,18 @@
-[![Continuous integration](https://github.com/s-ted/pfx-to-pem/workflows/CI/badge.svg)](https://github.com/s-ted/pfx-to-pem/actions/workflows/ci.yml)
-[![Crate](https://img.shields.io/crates/v/pfx-to-pem.svg)](https://crates.io/crates/pfx-to-pem/1.0.0)
-[![Packaging status](https://repology.org/badge/tiny-repos/pfx-to-pem.svg)](https://repology.org/project/pfx-to-pem/versions)
-[![HitCount](https://hits.dwyl.com/s-ted/pfx-to-pem.svg?style=flat-square&show=unique)](http://github.com/s-ted/pfx-to-pem)
+[![Continuous integration](https://github.com/s-ted/pfxers/workflows/CI/badge.svg)](https://github.com/s-ted/pfxers/actions/workflows/ci.yml)
+[![Crate](https://img.shields.io/crates/v/pfxers.svg)](https://crates.io/crates/pfxers/1.0.0)
+[![HitCount](https://hits.dwyl.com/s-ted/pfxers.svg?style=flat-square&show=unique)](http://github.com/s-ted/pfxers)
 
-# Pfx-to-pem
+# pfxers
 
-Pfx-to-pem allows you to look into PFX or PEM files, display their properties
+`pfxers` allows you to look into PFX or PEM files, display their properties
 and copy their contents (certificate, certificate chains, key).
 
 ### Cargo
 
-[![Crates.io](https://img.shields.io/crates/v/pfx-to-pem)](https://crates.io/crates/pfx-to-pem/1.0.0)
+[![Crates.io](https://img.shields.io/crates/v/pfxers)](https://crates.io/crates/pfxers/1.0.0)
 
 ```shell
-cargo install trippy --locked
+cargo install pfxers --locked
 ```
 
 ## Usage Examples
@@ -21,25 +20,25 @@ cargo install trippy --locked
 Basic usage:
 
 ```shell
-pfx-to-pem certificate.crt
+pfxers certificate.crt
 ```
 
 Using a password protected PFX file:
 
 ```shell
-pfx-to-pem password-protected.pfx --password 'thisissecret'
+pfxers password-protected.pfx --password 'thisissecret'
 ```
 
 Using a password protected PFX file, the password being in a file:
 
 ```shell
-pfx-to-pem password-protected.pfx --password-file password.txt
+pfxers password-protected.pfx --password-file password.txt
 ```
 
 ## Command Reference
 
 ```text
-Usage: pfx-to-pem [OPTIONS] <INPUT>
+Usage: pfxers [OPTIONS] <INPUT>
 
 Arguments:
   <INPUT>  The PFX/PKCS12/pem file to inspect
@@ -64,7 +63,7 @@ This project is licensed under either of
 
 at your option.
 
-Copyright 2024 [pfx-to-pem Contributors](https://github.com/s-ted/pfx-to-pem/graphs/contributors)
+Copyright 2024 [pfxers Contributors](https://github.com/s-ted/pfxers/graphs/contributors)
 
 ### Contribution
 
