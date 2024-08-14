@@ -7,9 +7,18 @@ publish = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0"
+color-eyre = "0.6"
+thiserror = "1.0"
 
-clap = { version = "4.5", features = ["derive", "env"] }
+better-panic = "0.3"
+clap = { version = "4.5", features = ["derive", "env", "cargo", "wrap_help"] }
+human-panic = "1.2"
+tracing = "0.1"
+tracing-error = "0.2"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+strip-ansi-escapes = "0.2"
+
+
 p12-keystore = "0.1"
 pem = "3.0"
 x509-parser = "0.16"
@@ -17,11 +26,15 @@ x509-parser = "0.16"
 env_logger = "0.11"
 log = "0.4"
 
-rpassword = "7.3"
-colored = "2.0"
+hide = "0.1"
+
+widgetui = "0.6"
+crokey = "1.0"
+new_mime_guess = "4.0"
+cli-clipboard = "0.4"
 
 [profile.release]
-strip = true  # Automatically strip symbols from the binary.
-opt-level = "z"  # Optimize for size.
+strip = true
+opt-level = 3
 lto = true
 panic = "abort"
