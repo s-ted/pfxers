@@ -1,6 +1,6 @@
 pub(crate) fn init() -> Result<()> {
     let env_filter =
-        EnvFilter::builder().with_default_directive(tracing::Level::INFO.into()).try_from_env()?;
+        EnvFilter::builder().with_default_directive(tracing::Level::INFO.into()).from_env_lossy();
 
     tracing_subscriber::registry().with(env_filter).with(ErrorLayer::default()).try_init()?;
     Ok(())
