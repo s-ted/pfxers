@@ -1,5 +1,5 @@
 [![Continuous integration](https://github.com/s-ted/pfxers/workflows/CI/badge.svg)](https://github.com/s-ted/pfxers/actions/workflows/ci.yml)
-[![Crate](https://img.shields.io/crates/v/pfxers.svg)](https://crates.io/crates/pfxers/1.0.0)
+[![Crate](https://img.shields.io/crates/v/pfxers.svg)](https://crates.io/crates/pfxers/1.0.1)
 [![HitCount](https://hits.dwyl.com/s-ted/pfxers.svg?style=flat-square&show=unique)](http://github.com/s-ted/pfxers)
 
 # pfxers
@@ -9,7 +9,7 @@ and copy their contents (certificate, certificate chains, key).
 
 ### Cargo
 
-[![Crates.io](https://img.shields.io/crates/v/pfxers)](https://crates.io/crates/pfxers/1.0.0)
+[![Crates.io](https://img.shields.io/crates/v/pfxers)](https://crates.io/crates/pfxers/1.0.1)
 
 ```shell
 cargo install pfxers --locked
